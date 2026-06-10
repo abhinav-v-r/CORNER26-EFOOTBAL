@@ -1,0 +1,6 @@
+{
+  "name": "Corner 26' eFootball Tournament",
+  "description": "Complete tournament management, group stages, fixtures, knockout brackets, and automatic standings calculation for the Corner 26 eFootball Tournament organized by UDSF NSSCE.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

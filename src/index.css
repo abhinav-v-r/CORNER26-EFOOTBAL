@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  body {
+    background-color: #0c0014; /* Deep dark purple/black */
+    font-family: var(--font-sans);
+    color: #f3f4f6;
+    overflow-x: hidden;
+  }
+
+  /* Custom styled scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0c0014;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2d0a4e;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #ee005f; /* FIFA Magenta */
+  }
+}
+
+/* Glassmorphism custom components */
+.glass-pane {
+  background: rgba(30, 20, 50, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-pane-premium {
+  background: radial-gradient(135deg, rgba(60, 10, 80, 0.6) 0%, rgba(12, 0, 20, 0.9) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(238, 0, 95, 0.25); /* Sleek magenta glow border */
+}
+
+/* Glowing sports neon border classes */
+.glow-magenta {
+  box-shadow: 0 0 20px rgba(238, 0, 95, 0.35);
+}
+
+.glow-magenta-strong {
+  box-shadow: 0 0 25px rgba(238, 0, 95, 0.6);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+}
+
+.glow-green {
+  box-shadow: 0 0 15px rgba(0, 229, 54, 0.25);
+}
+
+.glow-blue {
+  box-shadow: 0 0 15px rgba(30, 64, 175, 0.35);
+}
+
+.glow-gold {
+  box-shadow: 0 0 20px rgba(234, 179, 8, 0.4);
+}
+
+/* Subtle animated background grid */
+.football-pitch {
+  position: relative;
+  background-image: 
+    linear-gradient(rgba(238, 0, 95, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(238, 0, 95, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
