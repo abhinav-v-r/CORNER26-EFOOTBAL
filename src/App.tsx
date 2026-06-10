@@ -377,16 +377,23 @@ export default function App() {
 
             <form onSubmit={async (e) => {
               e.preventDefault();
+              setLoginError('');
               try {
                 await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
-                setLoginError('');
               } catch (signInErr: any) {
+                if (signInErr.code === 'auth/operation-not-allowed') {
+                  setLoginError('Email/Password provider is disabled. Please enable it in the Firebase Console (Authentication -> Sign-in method).');
+                  return;
+                }
                 if (loginEmail === 'admin12@corner.com' && loginPassword === 'corner#admin$5') {
                   try {
                     await createUserWithEmailAndPassword(auth, loginEmail, loginPassword);
-                    setLoginError('');
                   } catch (signUpErr: any) {
-                    setLoginError(signUpErr.message || 'Error occurred authenticating session.');
+                    if (signUpErr.code === 'auth/operation-not-allowed') {
+                      setLoginError('Email/Password provider is disabled. Please enable it in the Firebase Console (Authentication -> Sign-in method).');
+                    } else {
+                      setLoginError(signUpErr.message || 'Error occurred authenticating session.');
+                    }
                   }
                 } else {
                   setLoginError('Invalid administrator credentials.');
