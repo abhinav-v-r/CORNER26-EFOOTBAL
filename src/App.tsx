@@ -251,7 +251,7 @@ export default function App() {
               <span className="text-[10px] uppercase tracking-widest font-extrabold bg-blue-600 px-1.5 py-0.5 rounded text-white font-mono">
                 CORNER 26'
               </span>
-              <span className="text-xs font-bold text-slate-400 font-sans block">UDSF NSSCE eFootball</span>
+              <span className="text-xs font-bold text-slate-400 font-sans block">UDSF NSSCE eFOOTBALL</span>
             </div>
           </div>
           <button 
@@ -428,7 +428,7 @@ export default function App() {
                 <span className="text-[10px] text-slate-400 font-mono">UDSF NSSCE</span>
               </div>
               <h1 className="text-base font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-400 via-white to-sky-400">
-                EFOOTBALL TOURNAMENT
+                eFOOTBALL TOURNAMENT
               </h1>
             </div>
           </div>
@@ -523,7 +523,7 @@ export default function App() {
             
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tighter leading-none uppercase font-sans">
               <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-slate-200 to-slate-400">
-                E-FOOTBALL
+                eFOOTBALL
               </span>
               <span className="block mt-1 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-500 to-rose-500">
                 TOURNAMENT
@@ -1118,7 +1118,7 @@ export default function App() {
               </span>
             </div>
             <p className="text-[11px] text-slate-500 mt-2 relative z-10">
-              UDSF NSSCE Live eFootball Arena.
+              UDSF NSSCE Live eFOOTBALL Arena.
             </p>
           </div>
         </section>
@@ -1213,7 +1213,7 @@ export default function App() {
                 CORNER 26' eFOOTBALL
               </div>
               <p className="text-xs text-slate-500 tracking-wide font-mono leading-relaxed">
-                The premier collegiate eFootball tournament platform. Designed with passion for competitive gamers & football enthusiasts alike.
+                The premier collegiate eFOOTBALL tournament platform. Designed with passion for competitive gamers & football enthusiasts alike.
               </p>
             </div>
 
@@ -1225,7 +1225,7 @@ export default function App() {
               <div className="text-xs text-slate-400 space-y-1">
                 <p className="font-semibold text-white">UDSF NSSCE</p>
                 <p className="text-slate-500">NSS College of Engineering, Palakkad</p>
-                <p className="font-semibold text-sky-400 mt-1">eFootball Tournament</p>
+                <p className="font-semibold text-sky-400 mt-1">eFOOTBALL Tournament</p>
               </div>
             </div>
 
