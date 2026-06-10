@@ -1246,7 +1246,7 @@ export default function App() {
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500">
             <p>
-              © 2026 CORNER 26'. All rights preserved. Made with ❤️ for football lovers.
+              © 2026 CORNER 26'. All rights preserved. Made with ❤️ by <a href="https://github.com/abhinav-v-r" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-fuchsia-400 transition-colors underline decoration-fuchsia-400/40 hover:decoration-fuchsia-400 font-bold">Abhinav</a>.
             </p>
             <div className="flex items-center gap-4 text-[11px]">
               <span>UDSF • NSSCE</span>
