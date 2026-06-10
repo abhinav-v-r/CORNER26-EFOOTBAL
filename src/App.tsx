@@ -34,17 +34,14 @@ import {
   calculateLiveStats, 
   Standing 
 } from './tournamentUtils';
+import { db, auth, handleFirestoreError, OperationType } from './firebase';
+import { collection, doc, setDoc, deleteDoc, onSnapshot, getDocFromServer } from 'firebase/firestore';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 
 export default function App() {
   const [teams] = useState<Team[]>(initialTeams);
-  const [groupMatches, setGroupMatches] = useState<Match[]>(() => {
-    const saved = localStorage.getItem('corner26_group_matches_v1');
-    return saved ? JSON.parse(saved) : initialGroupMatches;
-  });
-  const [knockoutMatches, setKnockoutMatches] = useState<KnockoutMatch[]>(() => {
-    const saved = localStorage.getItem('corner26_knockout_matches_v1');
-    return saved ? JSON.parse(saved) : initialKnockoutMatchesConfig;
-  });
+  const [groupMatches, setGroupMatches] = useState<Match[]>(initialGroupMatches);
+  const [knockoutMatches, setKnockoutMatches] = useState<KnockoutMatch[]>(initialKnockoutMatchesConfig);
   
   const [currentPath, setCurrentPath] = useState(() => {
     const path = window.location.pathname;
@@ -95,6 +92,95 @@ export default function App() {
     }
   }, [currentPath, isAdminLoggedIn]);
 
+  // Auth State Listener
+  React.useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user && user.email === 'admin12@corner.com') {
+        setIsAdminLoggedIn(true);
+        sessionStorage.setItem('corner26_admin_logged_in_v1', 'true');
+      } else {
+        setIsAdminLoggedIn(false);
+        setAdminMode(false);
+        sessionStorage.removeItem('corner26_admin_logged_in_v1');
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Connection Test Effect
+  React.useEffect(() => {
+    async function testConnection() {
+      try {
+        await getDocFromServer(doc(db, 'test', 'connection'));
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('the client is offline')) {
+          console.error("Please check your Firebase configuration.");
+        }
+      }
+    }
+    testConnection();
+  }, []);
+
+  // Real-time synchronization of group stage matches
+  React.useEffect(() => {
+    const unsub = onSnapshot(collection(db, 'group_matches'), (snapshot) => {
+      const firestoreGroupMap = new Map();
+      snapshot.forEach((doc) => {
+        firestoreGroupMap.set(doc.id, doc.data());
+      });
+      
+      setGroupMatches(() => {
+        return initialGroupMatches.map(m => {
+          const dbMatch = firestoreGroupMap.get(m.id);
+          if (dbMatch) {
+            return {
+              ...m,
+              team1Score: dbMatch.team1Score !== undefined ? dbMatch.team1Score : null,
+              team2Score: dbMatch.team2Score !== undefined ? dbMatch.team2Score : null,
+              completed: !!dbMatch.completed
+            };
+          }
+          return m;
+        });
+      });
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'group_matches');
+    });
+
+    return () => unsub();
+  }, []);
+
+  // Real-time synchronization of knockout matches
+  React.useEffect(() => {
+    const unsub = onSnapshot(collection(db, 'knockout_matches'), (snapshot) => {
+      const firestoreKoMap = new Map();
+      snapshot.forEach((doc) => {
+        firestoreKoMap.set(doc.id, doc.data());
+      });
+      
+      setKnockoutMatches(() => {
+        return initialKnockoutMatchesConfig.map(m => {
+          const dbMatch = firestoreKoMap.get(m.id);
+          if (dbMatch) {
+            return {
+              ...m,
+              team1Score: dbMatch.team1Score !== undefined ? dbMatch.team1Score : null,
+              team2Score: dbMatch.team2Score !== undefined ? dbMatch.team2Score : null,
+              completed: !!dbMatch.completed,
+              penalties1: dbMatch.penalties1 !== undefined ? dbMatch.penalties1 : null,
+              penalties2: dbMatch.penalties2 !== undefined ? dbMatch.penalties2 : null
+            };
+          }
+          return m;
+        });
+      });
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'knockout_matches');
+    });
+
+    return () => unsub();
+  }, []);
+
   const [editingMatch, setEditingMatch] = useState<{
     id: string;
     isKnockout: boolean;
@@ -108,7 +194,7 @@ export default function App() {
   } | null>(null);
 
   // Score updater handlers
-  const handleSaveMatch = (
+  const handleSaveMatch = async (
     id: string, 
     isKnockout: boolean, 
     score1: number | null, 
@@ -118,45 +204,48 @@ export default function App() {
     pen2?: number | null
   ) => {
     if (isKnockout) {
-      const updated = knockoutMatches.map(m => {
-        if (m.id === id) {
-          return { 
-            ...m, 
-            team1Score: completed ? score1 : null, 
-            team2Score: completed ? score2 : null, 
-            completed,
-            penalties1: completed && score1 === score2 ? (pen1 ?? null) : null,
-            penalties2: completed && score1 === score2 ? (pen2 ?? null) : null
-          };
-        }
-        return m;
-      });
-      setKnockoutMatches(updated);
-      localStorage.setItem('corner26_knockout_matches_v1', JSON.stringify(updated));
+      try {
+        await setDoc(doc(db, 'knockout_matches', id), {
+          id,
+          team1Score: completed ? score1 : null,
+          team2Score: completed ? score2 : null,
+          completed,
+          penalties1: completed && score1 === score2 ? (pen1 ?? null) : null,
+          penalties2: completed && score1 === score2 ? (pen2 ?? null) : null
+        });
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, `knockout_matches/${id}`);
+      }
     } else {
-      const updated = groupMatches.map(m => {
-        if (m.id === id) {
-          return { 
-            ...m, 
-            team1Score: completed ? score1 : null, 
-            team2Score: completed ? score2 : null, 
-            completed 
-          };
-        }
-        return m;
-      });
-      setGroupMatches(updated);
-      localStorage.setItem('corner26_group_matches_v1', JSON.stringify(updated));
+      try {
+        await setDoc(doc(db, 'group_matches', id), {
+          id,
+          team1Score: completed ? score1 : null,
+          team2Score: completed ? score2 : null,
+          completed
+        });
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, `group_matches/${id}`);
+      }
     }
     setEditingMatch(null);
   };
 
-  const handleResetTournament = () => {
+  const handleResetTournament = async () => {
     if (window.confirm("Are you sure you want to reset all tournament scores and results to not started?")) {
-      localStorage.removeItem('corner26_group_matches_v1');
-      localStorage.removeItem('corner26_knockout_matches_v1');
-      setGroupMatches(initialGroupMatches.map(m => ({ ...m, team1Score: null, team2Score: null, completed: false })));
-      setKnockoutMatches(initialKnockoutMatchesConfig.map(m => ({ ...m, team1Score: null, team2Score: null, completed: false })));
+      try {
+        const groupToDelete = groupMatches.filter(m => m.completed || m.team1Score !== null || m.team2Score !== null);
+        const koToDelete = knockoutMatches.filter(m => m.completed || m.team1Score !== null || m.team2Score !== null);
+        
+        const deletePromises = [
+          ...groupToDelete.map(m => deleteDoc(doc(db, 'group_matches', m.id))),
+          ...koToDelete.map(m => deleteDoc(doc(db, 'knockout_matches', m.id)))
+        ];
+        
+        await Promise.all(deletePromises);
+      } catch (error) {
+        console.error("Failed to reset Firestore matches:", error);
+      }
       setAdminMode(false);
       setEditingMatch(null);
     }
@@ -286,15 +375,29 @@ export default function App() {
               </div>
             )}
 
-            <form onSubmit={(e) => {
+            <form onSubmit={async (e) => {
               e.preventDefault();
-              if (loginEmail === 'admin12@corner.com' && loginPassword === 'corner#admin$5') {
-                setIsAdminLoggedIn(true);
-                setAdminMode(true);
-                sessionStorage.setItem('corner26_admin_logged_in_v1', 'true');
-                setLoginError('');
-              } else {
-                setLoginError('Invalid administrator credentials.');
+              setLoginError('');
+              try {
+                await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
+              } catch (signInErr: any) {
+                if (signInErr.code === 'auth/operation-not-allowed') {
+                  setLoginError('Email/Password provider is disabled. Please enable it in the Firebase Console (Authentication -> Sign-in method).');
+                  return;
+                }
+                if (loginEmail === 'admin12@corner.com' && loginPassword === 'corner#admin$5') {
+                  try {
+                    await createUserWithEmailAndPassword(auth, loginEmail, loginPassword);
+                  } catch (signUpErr: any) {
+                    if (signUpErr.code === 'auth/operation-not-allowed') {
+                      setLoginError('Email/Password provider is disabled. Please enable it in the Firebase Console (Authentication -> Sign-in method).');
+                    } else {
+                      setLoginError(signUpErr.message || 'Error occurred authenticating session.');
+                    }
+                  }
+                } else {
+                  setLoginError('Invalid administrator credentials.');
+                }
               }
             }} className="space-y-4">
               <div>
@@ -365,7 +468,12 @@ export default function App() {
               Public Mode
             </button>
             <button
-              onClick={() => {
+              onClick={async () => {
+                try {
+                  await signOut(auth);
+                } catch (err) {
+                  console.error("Sign out error", err);
+                }
                 setIsAdminLoggedIn(false);
                 setAdminMode(false);
                 sessionStorage.removeItem('corner26_admin_logged_in_v1');
