@@ -523,7 +523,7 @@ export default function App() {
             
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tighter leading-none uppercase font-sans">
               <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-slate-200 to-slate-400">
-                EFOOTBALL
+                E-FOOTBALL
               </span>
               <span className="block mt-1 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-500 to-rose-500">
                 TOURNAMENT
