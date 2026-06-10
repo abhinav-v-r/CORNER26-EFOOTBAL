@@ -111,7 +111,7 @@ export default function App() {
             const randomLeft = Math.floor(Math.random() * 100);
             const randomDelay = Math.random() * 8;
             const randomDuration = 4 + Math.random() * 5;
-            const colors = ['bg-yellow-400', 'bg-emerald-400', 'bg-sky-400', 'bg-pink-500', 'bg-purple-400'];
+            const colors = ['bg-yellow-400', 'bg-fuchsia-400', 'bg-sky-400', 'bg-pink-500', 'bg-purple-400'];
             const randomColor = colors[i % colors.length];
             return (
               <div 
@@ -141,17 +141,17 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
           {/* Logo Brand */}
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl glow-green">
-              <Trophy className="w-6 h-6 text-emerald-400 animate-pulse" />
+            <div className="p-2 bg-fuchsia-500/10 border border-fuchsia-500/30 rounded-xl glow-magenta">
+              <Trophy className="w-6 h-6 text-fuchsia-400 animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] uppercase tracking-widest font-extrabold bg-blue-600 px-1.5 py-0.5 rounded text-white font-mono">
                   CORNER 26'
                 </span>
-                <span className="text-[10px] text-slate-400 font-mono">UDSF NSSCE</span>
+                <span className="text-[10px] text-slate-400 font-mono">FIFA GLOBAL</span>
               </div>
-              <h1 className="text-base font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-white to-sky-400">
+              <h1 className="text-base font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-400 via-white to-sky-400">
                 EFOOTBALL TOURNAMENT
               </h1>
             </div>
@@ -185,15 +185,15 @@ export default function App() {
       {/* QUICK FLOATING TELEPORT LINKS */}
       <div className="bg-slate-900/40 border-b border-slate-850 py-3 scrollbar-none overflow-x-auto whitespace-nowrap">
         <div className="max-w-7xl mx-auto px-4 select-none flex items-center gap-3 md:justify-center text-xs font-semibold tracking-wider uppercase font-mono">
-          <a href="#hero" className="text-slate-400 hover:text-emerald-400 transition-colors px-2 py-1">Home</a>
+          <a href="#hero" className="text-slate-400 hover:text-fuchsia-400 transition-colors px-2 py-1">Home</a>
           <span className="text-slate-700">•</span>
-          <a href="#overview" className="text-slate-400 hover:text-emerald-400 transition-colors px-2 py-1">Overview</a>
+          <a href="#overview" className="text-slate-400 hover:text-fuchsia-400 transition-colors px-2 py-1">Overview</a>
           <span className="text-slate-700">•</span>
-          <a href="#standings" className="text-slate-400 hover:text-emerald-400 transition-colors px-2 py-1">Groups</a>
+          <a href="#standings" className="text-slate-400 hover:text-fuchsia-400 transition-colors px-2 py-1">Groups</a>
           <span className="text-slate-700">•</span>
-          <a href="#fixtures" className="text-slate-400 hover:text-emerald-400 transition-colors px-2 py-1">Fixtures</a>
+          <a href="#fixtures" className="text-slate-400 hover:text-fuchsia-400 transition-colors px-2 py-1">Fixtures</a>
           <span className="text-slate-700">•</span>
-          <a href="#qualification" className="text-slate-400 hover:text-emerald-400 transition-colors px-2 py-1">Qualification</a>
+          <a href="#qualification" className="text-slate-400 hover:text-fuchsia-400 transition-colors px-2 py-1">Qualification</a>
           <span className="text-slate-700">•</span>
           <a href="#bracket" className="text-slate-400 hover:text-[#00E536] transition-colors px-2 py-1">Bracket</a>
           <span className="text-slate-700">•</span>
@@ -219,7 +219,7 @@ export default function App() {
               <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-slate-200 to-slate-400">
                 EFOOTBALL
               </span>
-              <span className="block mt-1 bg-clip-text text-transparent bg-gradient-to-r from-[#ee005f] via-[#00f0ff] to-[#00E536]">
+              <span className="block mt-1 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-500 to-rose-500">
                 TOURNAMENT
               </span>
             </h1>
@@ -233,17 +233,17 @@ export default function App() {
           <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4 border-y border-slate-800/60 py-6 max-w-3xl w-full text-xs font-mono tracking-widest uppercase text-slate-400">
             <div className="flex flex-col items-center justify-center p-2">
               <span className="text-[10px] text-slate-500 block mb-1">Organized By</span>
-              <span className="font-bold text-white tracking-wide">UDSF</span>
+              <span className="font-bold text-white tracking-wide">FIFA 26</span>
               <span className="text-[9px] text-slate-500 tracking-normal normal-case mt-0.5">United Democratic Students Front</span>
             </div>
             <div className="flex flex-col items-center justify-center p-2 border-y md:border-y-0 md:border-x border-slate-800/60">
               <span className="text-[10px] text-slate-500 block mb-1">Venue Host</span>
-              <span className="font-bold text-emerald-400 tracking-wide text-center">NSS COLLEGE OF ENG.</span>
+              <span className="font-bold text-fuchsia-400 tracking-wide text-center">FIFA ESPORTS ARENA</span>
               <span className="text-[9px] text-slate-500 tracking-normal normal-case mt-0.5">Palakkad, Kerala</span>
             </div>
             <div className="flex flex-col items-center justify-center p-2">
               <span className="text-[10px] text-slate-500 block mb-1">eSports Partner</span>
-              <span className="font-bold text-sky-400 tracking-wide">FIFA ARISES</span>
+              <span className="font-bold text-sky-400 tracking-wide">ROAD TO FIFA 26</span>
               <span className="text-[9px] text-slate-500 tracking-normal normal-case mt-0.5">Gaming Guild</span>
             </div>
           </div>
@@ -270,8 +270,8 @@ export default function App() {
         {/* 2. TOURNAMENT OVERVIEW SECTION */}
         <section id="overview" className="space-y-6">
           <div className="flex items-center gap-3">
-            <span className="w-8 h-px bg-emerald-500"></span>
-            <h2 className="text-xs font-mono font-black uppercase tracking-widest text-emerald-400">
+            <span className="w-8 h-px bg-fuchsia-500"></span>
+            <h2 className="text-xs font-mono font-black uppercase tracking-widest text-fuchsia-400">
               Tournament Structure
             </h2>
           </div>
@@ -314,13 +314,13 @@ export default function App() {
             </div>
 
             {/* Stat Box 4 */}
-            <div className="glass-pane rounded-2xl p-5 border-emerald-500/20 bg-emerald-950/10 rounded-2xl p-5 flex items-start gap-4">
-              <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">
+            <div className="glass-pane rounded-2xl p-5 border-fuchsia-500/20 bg-fuchsia-950/10 rounded-2xl p-5 flex items-start gap-4">
+              <div className="p-3 rounded-xl bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/25">
                 <TrendingUp className="w-5 h-5" />
               </div>
               <div>
                 <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">Qualification</span>
-                <span className="text-3xl font-extrabold font-mono text-emerald-400">Top 2 Teams</span>
+                <span className="text-3xl font-extrabold font-mono text-fuchsia-400">Top 2 Teams</span>
                 <span className="text-xs text-slate-400 block mt-1">Advance to Round of 24</span>
               </div>
             </div>
@@ -332,8 +332,8 @@ export default function App() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-3">
-                <span className="w-8 h-px bg-emerald-500"></span>
-                <h2 className="text-xs font-mono font-black uppercase tracking-widest text-emerald-400">
+                <span className="w-8 h-px bg-fuchsia-500"></span>
+                <h2 className="text-xs font-mono font-black uppercase tracking-widest text-fuchsia-400">
                   Group Standings Table
                 </h2>
               </div>
@@ -348,7 +348,7 @@ export default function App() {
                 onClick={() => setGroupStageView('GRID')}
                 className={`px-3 py-1 text-xs font-mono font-bold rounded-md transition-all ${
                   groupStageView === 'GRID' 
-                    ? 'bg-emerald-500 text-slate-950 shadow' 
+                    ? 'bg-fuchsia-500 text-slate-950 shadow' 
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -358,7 +358,7 @@ export default function App() {
                 onClick={() => setGroupStageView('TAB')}
                 className={`px-3 py-1 text-xs font-mono font-bold rounded-md transition-all ${
                   groupStageView === 'TAB' 
-                    ? 'bg-emerald-500 text-slate-950 shadow' 
+                    ? 'bg-fuchsia-500 text-slate-950 shadow' 
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -376,7 +376,7 @@ export default function App() {
                   onClick={() => setActiveGroupTab(id)}
                   className={`px-4 py-2.5 rounded-lg text-xs font-bold font-mono border transition-all shrink-0 ${
                     activeGroupTab === id 
-                      ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-extrabold' 
+                      ? 'bg-fuchsia-500 text-slate-950 border-fuchsia-400 font-extrabold' 
                       : 'bg-slate-900/40 text-slate-400 border-slate-800 hover:text-white hover:border-slate-700'
                   }`}
                 >
@@ -461,7 +461,7 @@ export default function App() {
                     onClick={() => setSelectedStatusFilter(st)}
                     className={`px-2.5 py-1 rounded text-[11px] tracking-wide uppercase transition-all ${
                       selectedStatusFilter === st
-                        ? 'bg-slate-800 text-emerald-400 font-bold'
+                        ? 'bg-slate-800 text-fuchsia-400 font-bold'
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
@@ -500,7 +500,7 @@ export default function App() {
                     {/* Top Group Marker Header */}
                     <div className="flex justify-between items-center bg-slate-900/50 px-4 py-2 border-b border-slate-850 text-[10px] font-mono uppercase tracking-widest text-slate-400">
                       <span>GROUP {m.group} Stage</span>
-                      <span className={`f-semibold ${m.completed ? 'text-emerald-400' : 'text-yellow-500'}`}>
+                      <span className={`f-semibold ${m.completed ? 'text-fuchsia-400' : 'text-yellow-500'}`}>
                         {m.completed ? 'Match Played' : 'Upcoming'}
                       </span>
                     </div>
@@ -512,7 +512,7 @@ export default function App() {
                         <div className="col-span-2 text-right space-y-1">
                           <span 
                             className={`block text-xs font-bold leading-tight truncate px-1 ${
-                              isT1Winner ? 'text-white underline decoration-emerald-400 decoration-2' : m.completed ? 'text-slate-400' : 'text-slate-200'
+                              isT1Winner ? 'text-white underline decoration-fuchsia-400 decoration-2' : m.completed ? 'text-slate-400' : 'text-slate-200'
                             }`}
                             title={team1.name}
                           >
@@ -532,7 +532,7 @@ export default function App() {
                         <div className="col-span-2 text-left space-y-1">
                           <span 
                             className={`block text-xs font-bold leading-tight truncate px-1 ${
-                              isT2Winner ? 'text-white underline decoration-emerald-400 decoration-2' : m.completed ? 'text-slate-400' : 'text-slate-200'
+                              isT2Winner ? 'text-white underline decoration-fuchsia-400 decoration-2' : m.completed ? 'text-slate-400' : 'text-slate-200'
                             }`}
                             title={team2.name}
                           >
@@ -596,7 +596,7 @@ export default function App() {
                       <div className="p-3 space-y-2 text-xs flex-1 flex flex-col justify-center">
                         {/* Winner */}
                         <div className="space-y-0.5">
-                          <span className="text-[9px] uppercase font-mono text-emerald-400 block tracking-widest">
+                          <span className="text-[9px] uppercase font-mono text-fuchsia-400 block tracking-widest">
                             🥇 Winner
                           </span>
                           <span className="font-bold text-slate-200 block truncate" title={q.winner.team.name}>
@@ -627,8 +627,8 @@ export default function App() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-3">
-                <span className="w-8 h-px bg-emerald-500"></span>
-                <h2 className="text-xs font-mono font-black uppercase tracking-widest text-emerald-400">
+                <span className="w-8 h-px bg-fuchsia-500"></span>
+                <h2 className="text-xs font-mono font-black uppercase tracking-widest text-fuchsia-400">
                   Knockout Stage Bracket
                 </h2>
               </div>
@@ -770,7 +770,7 @@ export default function App() {
               ⌛ Remaining Fixtures
             </span>
             <div className="flex items-baseline gap-2 mt-4">
-              <span className="text-4xl font-extrabold font-mono text-emerald-400">
+              <span className="text-4xl font-extrabold font-mono text-fuchsia-400">
                 {liveStats.remaining}
               </span>
               <span className="text-slate-500 font-mono text-sm">matches</span>
@@ -795,18 +795,18 @@ export default function App() {
             </p>
           </div>
 
-          <div className="glass-pane p-6 rounded-2xl border border-emerald-500/10 flex flex-col justify-between overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl" />
+          <div className="glass-pane p-6 rounded-2xl border border-fuchsia-500/10 flex flex-col justify-between overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-fuchsia-500/5 rounded-full blur-2xl" />
             <span className="text-xs text-slate-400 font-mono uppercase tracking-widest">
               🎮 Active Tournament Stage
             </span>
             <div className="flex items-baseline gap-2 mt-4 relative z-10">
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-sky-400 truncate max-w-full">
+              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-400 to-sky-400 truncate max-w-full">
                 {liveStats.stageName}
               </span>
             </div>
             <p className="text-[11px] text-slate-500 mt-2 relative z-10">
-              UDSF NSSCE Live eFootball Arena.
+              Official FIFA 26 Esports Hub.
             </p>
           </div>
         </section>
@@ -897,7 +897,7 @@ export default function App() {
             {/* Left Col */}
             <div className="space-y-3">
               <div className="flex items-center gap-2 font-black text-white tracking-widest text-sm font-sans uppercase">
-                <span className="p-1 px-2 bg-emerald-500 rounded text-slate-950 text-xs">⚽</span>
+                <span className="p-1 px-2 bg-fuchsia-500 rounded text-slate-950 text-xs">⚽</span>
                 CORNER 26' eFOOTBALL
               </div>
               <p className="text-xs text-slate-500 tracking-wide font-mono leading-relaxed">
@@ -911,9 +911,9 @@ export default function App() {
                 ORGANIZERS & GUILD
               </span>
               <div className="text-xs text-slate-400 space-y-1">
-                <p className="font-semibold text-white">UDSF (United Democratic Students Front)</p>
-                <p className="text-slate-500">NSS College of Engineering, Palakkad</p>
-                <p className="font-semibold text-sky-400 mt-1">FIFA ARISES Gaming League</p>
+                <p className="font-semibold text-white">FIFA 26 Esports Organization</p>
+                <p className="text-slate-500">Official World Cup Gaming League</p>
+                <p className="font-semibold text-sky-400 mt-1">FIFA 26 WORLD CUP E-SPORTS</p>
               </div>
             </div>
 
@@ -923,9 +923,9 @@ export default function App() {
                 TOURNAMENT LINKS
               </span>
               <div className="text-xs font-mono space-y-1.5">
-                <a href="#hero" className="block text-slate-400 hover:text-emerald-400 transition-colors">➔ Welcome Deck</a>
-                <a href="#standings" className="block text-slate-400 hover:text-emerald-400 transition-colors">➔ Interactive Standings</a>
-                <a href="#bracket" className="block text-slate-400 hover:text-emerald-400 transition-colors">➔ Knockout Grid Bracket</a>
+                <a href="#hero" className="block text-slate-400 hover:text-fuchsia-400 transition-colors">➔ Welcome Deck</a>
+                <a href="#standings" className="block text-slate-400 hover:text-fuchsia-400 transition-colors">➔ Interactive Standings</a>
+                <a href="#bracket" className="block text-slate-400 hover:text-fuchsia-400 transition-colors">➔ Knockout Grid Bracket</a>
               </div>
             </div>
           </div>
@@ -937,9 +937,9 @@ export default function App() {
               © 2026 CORNER 26'. All rights preserved. Made with ❤️ for football lovers.
             </p>
             <div className="flex items-center gap-4 text-[11px]">
-              <span>UDSF • NSSCE</span>
+              <span>FIFA • 2026</span>
               <span>•</span>
-              <span className="text-emerald-400 font-bold">FIFA ARISES</span>
+              <span className="text-fuchsia-400 font-bold">ROAD TO FIFA 26</span>
             </div>
           </div>
         </div>
@@ -963,10 +963,10 @@ function GroupStandingTableCard({ groupId, standings }: GroupStandingCardProps) 
       {/* Group Header Title */}
       <div className="px-5 py-3 bg-gradient-to-r from-slate-900 to-slate-950 border-b border-slate-850 flex items-center justify-between">
         <span className="font-extrabold tracking-wide text-sm text-slate-100 flex items-center gap-1.5 font-sans">
-          <span className="w-1.5 h-3 bg-emerald-400 rounded-full inline-block"></span>
+          <span className="w-1.5 h-3 bg-fuchsia-400 rounded-full inline-block"></span>
           GROUP {groupId}
         </span>
-        <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20">
           Group Stage
         </span>
       </div>
@@ -995,7 +995,7 @@ function GroupStandingTableCard({ groupId, standings }: GroupStandingCardProps) 
                   key={s.team.id}
                   className={`border-b border-slate-900/60 text-xs font-mono transition-colors ${
                     isQualified 
-                      ? 'bg-emerald-500/[0.015] hover:bg-emerald-500/[0.03]' 
+                      ? 'bg-fuchsia-500/[0.015] hover:bg-fuchsia-500/[0.03]' 
                       : 'hover:bg-slate-900/40'
                   }`}
                 >
@@ -1004,7 +1004,7 @@ function GroupStandingTableCard({ groupId, standings }: GroupStandingCardProps) 
                     <span 
                       className={`inline-flex items-center justify-center w-5 h-5 rounded-md font-bold text-[10px] ${
                         isQualified 
-                          ? 'bg-emerald-500 text-slate-950 font-black' 
+                          ? 'bg-fuchsia-500 text-slate-950 font-black' 
                           : 'bg-slate-900 text-slate-400'
                       }`}
                     >
@@ -1019,7 +1019,7 @@ function GroupStandingTableCard({ groupId, standings }: GroupStandingCardProps) 
                         {s.team.name}
                       </span>
                       {isQualified && (
-                        <span className="text-[9px] text-emerald-400/90 tracking-widest uppercase font-mono mt-0.5 transform scale-90 origin-left">
+                        <span className="text-[9px] text-fuchsia-400/90 tracking-widest uppercase font-mono mt-0.5 transform scale-90 origin-left">
                           ★ QUALIFIED
                         </span>
                       )}
@@ -1036,13 +1036,13 @@ function GroupStandingTableCard({ groupId, standings }: GroupStandingCardProps) 
                   <td className="py-2.5 px-1 text-center text-slate-400">{s.losses}</td>
                   {/* GD */}
                   <td className={`py-2.5 px-1.5 text-center font-bold ${
-                    s.gd > 0 ? 'text-emerald-400' : s.gd < 0 ? 'text-red-400' : 'text-slate-400'
+                    s.gd > 0 ? 'text-fuchsia-400' : s.gd < 0 ? 'text-red-400' : 'text-slate-400'
                   }`}>
                     {s.gd > 0 ? `+${s.gd}` : s.gd}
                   </td>
                   {/* Points */}
                   <td className={`py-2.5 px-3 text-center font-extrabold text-sm ${
-                    isQualified ? 'text-emerald-400 bg-emerald-500/[0.03]' : 'text-slate-200 bg-slate-950/20'
+                    isQualified ? 'text-fuchsia-400 bg-fuchsia-500/[0.03]' : 'text-slate-200 bg-slate-950/20'
                   }`}>
                     {s.points}
                   </td>
@@ -1091,14 +1091,14 @@ function BracketMatchCard({ match }: BracketMatchProps) {
       {/* Top Banner indicating title / stage progress */}
       <div className="bg-slate-950 px-3 py-1.5 border-b border-slate-850 flex items-center justify-between text-[9px] font-mono font-extrabold uppercase tracking-widest text-slate-400">
         <span>{match.title}</span>
-        <span className={match.completed ? 'text-emerald-400' : 'text-slate-500'}>
+        <span className={match.completed ? 'text-fuchsia-400' : 'text-slate-500'}>
           {match.completed ? 'Completed' : 'PENDING'}
         </span>
       </div>
 
       <div className="p-3 space-y-2">
         {/* TEAM 1 */}
-        <div className={`flex items-center justify-between p-2 rounded-lg ${isT1Winner ? 'bg-emerald-500/5 border border-emerald-500/20' : 'bg-slate-950/40 border border-transparent'}`}>
+        <div className={`flex items-center justify-between p-2 rounded-lg ${isT1Winner ? 'bg-fuchsia-500/5 border border-fuchsia-500/20' : 'bg-slate-950/40 border border-transparent'}`}>
           <div className="space-y-0.5 max-w-[170px] truncate">
             {match.team1 ? (
               <>
@@ -1120,14 +1120,14 @@ function BracketMatchCard({ match }: BracketMatchProps) {
                 ({match.penalties1})
               </span>
             )}
-            <span className={`w-8 text-center text-sm font-extrabold font-mono ${isT1Winner ? 'text-emerald-400' : 'text-slate-200'}`}>
+            <span className={`w-8 text-center text-sm font-extrabold font-mono ${isT1Winner ? 'text-fuchsia-400' : 'text-slate-200'}`}>
               {match.completed && match.team1Score !== null ? match.team1Score : '-'}
             </span>
           </div>
         </div>
 
         {/* TEAM 2 */}
-        <div className={`flex items-center justify-between p-2 rounded-lg ${isT2Winner ? 'bg-emerald-500/5 border border-emerald-500/20' : 'bg-slate-950/40 border border-transparent'}`}>
+        <div className={`flex items-center justify-between p-2 rounded-lg ${isT2Winner ? 'bg-fuchsia-500/5 border border-fuchsia-500/20' : 'bg-slate-950/40 border border-transparent'}`}>
           <div className="space-y-0.5 max-w-[170px] truncate">
             {match.team2 ? (
               <>
@@ -1149,7 +1149,7 @@ function BracketMatchCard({ match }: BracketMatchProps) {
                 ({match.penalties2})
               </span>
             )}
-            <span className={`w-8 text-center text-sm font-extrabold font-mono ${isT2Winner ? 'text-emerald-400' : 'text-slate-200'}`}>
+            <span className={`w-8 text-center text-sm font-extrabold font-mono ${isT2Winner ? 'text-fuchsia-400' : 'text-slate-200'}`}>
               {match.completed && match.team2Score !== null ? match.team2Score : '-'}
             </span>
           </div>
