@@ -278,8 +278,15 @@ export function calculateLiveStats(
   const totalMatches = groupTotal + koTotal;
   const remaining = totalMatches - totalCompleted;
 
-  const countCompletedGroupStages = matches.filter(m => m.completed).length;
-  const qualifiedCount = countCompletedGroupStages > 0 ? 16 : 0;
+  const groups = ["A", "B", "C", "D", "E", "F", "G", "H"];
+  let fullyCompletedGroups = 0;
+  groups.forEach(g => {
+    const gMatches = matches.filter(m => m.group === g);
+    if (gMatches.length > 0 && gMatches.every(m => m.completed)) {
+      fullyCompletedGroups++;
+    }
+  });
+  const qualifiedCount = fullyCompletedGroups * 2;
 
   let stageName = "Group Stage";
   if (koCompleted === koTotal && koTotal > 0 && champion) {
@@ -294,7 +301,7 @@ export function calculateLiveStats(
     stageName = "Semi-Finals";
   } else if (koMatches.filter(m => m.stage === "r16" && m.completed).length > 0) {
     stageName = "Quarter-Finals";
-  } else if (countCompletedGroupStages > 0) {
+  } else if (fullyCompletedGroups === 8) {
     stageName = "Round of 16";
   }
 

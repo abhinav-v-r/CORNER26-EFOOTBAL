@@ -995,7 +995,7 @@ export default function App() {
               <div>
                 <h3 className="text-lg font-bold text-white">How Qualification Works</h3>
                 <p className="text-sm text-slate-400 mt-1">
-                  The 48 teams are allocated across 12 distinct groups (A to L). The top 2 performing teams of each group automatically secure access into the knockout state. Group winners are globally ranked: the top 8 receive automatic byes and wait in the Round of 16, whereas the remaining 16 dynamic qualifiers face off immediately during the Round of 24.
+                  The 32 teams are allocated across 8 distinct groups (A to H). The top 2 performing teams of each group automatically secure access into the knockout stage, advancing directly to the Round of 16.
                 </p>
               </div>
             </div>
