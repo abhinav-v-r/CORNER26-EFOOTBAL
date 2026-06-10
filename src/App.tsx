@@ -37,8 +37,144 @@ import {
 
 export default function App() {
   const [teams] = useState<Team[]>(initialTeams);
-  const [groupMatches] = useState<Match[]>(initialGroupMatches);
-  const [knockoutMatches] = useState<KnockoutMatch[]>(initialKnockoutMatchesConfig);
+  const [groupMatches, setGroupMatches] = useState<Match[]>(() => {
+    const saved = localStorage.getItem('corner26_group_matches_v1');
+    return saved ? JSON.parse(saved) : initialGroupMatches;
+  });
+  const [knockoutMatches, setKnockoutMatches] = useState<KnockoutMatch[]>(() => {
+    const saved = localStorage.getItem('corner26_knockout_matches_v1');
+    return saved ? JSON.parse(saved) : initialKnockoutMatchesConfig;
+  });
+  
+  const [currentPath, setCurrentPath] = useState(() => {
+    const path = window.location.pathname;
+    const hash = window.location.hash;
+    if (path === '/admin' || hash === '#/admin' || hash === '#admin') {
+      return '/admin';
+    }
+    return '/';
+  });
+
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
+    return sessionStorage.getItem('corner26_admin_logged_in_v1') === 'true';
+  });
+
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+
+  const [adminMode, setAdminMode] = useState(false);
+
+  React.useEffect(() => {
+    const handleUrlChange = () => {
+      const path = window.location.pathname;
+      const hash = window.location.hash;
+      if (path === '/admin' || hash === '#/admin' || hash === '#admin') {
+        setCurrentPath('/admin');
+      } else {
+        setCurrentPath('/');
+      }
+    };
+
+    window.addEventListener('popstate', handleUrlChange);
+    window.addEventListener('hashchange', handleUrlChange);
+    
+    handleUrlChange();
+
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('hashchange', handleUrlChange);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (currentPath === '/admin' && isAdminLoggedIn) {
+      setAdminMode(true);
+    } else {
+      setAdminMode(false);
+    }
+  }, [currentPath, isAdminLoggedIn]);
+
+  const [editingMatch, setEditingMatch] = useState<{
+    id: string;
+    isKnockout: boolean;
+    team1Name: string;
+    team2Name: string;
+    team1Score: number | null;
+    team2Score: number | null;
+    completed: boolean;
+    penalties1?: number | null;
+    penalties2?: number | null;
+  } | null>(null);
+
+  // Score updater handlers
+  const handleSaveMatch = (
+    id: string, 
+    isKnockout: boolean, 
+    score1: number | null, 
+    score2: number | null, 
+    completed: boolean,
+    pen1?: number | null,
+    pen2?: number | null
+  ) => {
+    if (isKnockout) {
+      const updated = knockoutMatches.map(m => {
+        if (m.id === id) {
+          return { 
+            ...m, 
+            team1Score: completed ? score1 : null, 
+            team2Score: completed ? score2 : null, 
+            completed,
+            penalties1: completed && score1 === score2 ? (pen1 ?? null) : null,
+            penalties2: completed && score1 === score2 ? (pen2 ?? null) : null
+          };
+        }
+        return m;
+      });
+      setKnockoutMatches(updated);
+      localStorage.setItem('corner26_knockout_matches_v1', JSON.stringify(updated));
+    } else {
+      const updated = groupMatches.map(m => {
+        if (m.id === id) {
+          return { 
+            ...m, 
+            team1Score: completed ? score1 : null, 
+            team2Score: completed ? score2 : null, 
+            completed 
+          };
+        }
+        return m;
+      });
+      setGroupMatches(updated);
+      localStorage.setItem('corner26_group_matches_v1', JSON.stringify(updated));
+    }
+    setEditingMatch(null);
+  };
+
+  const handleResetTournament = () => {
+    if (window.confirm("Are you sure you want to reset all tournament scores and results to not started?")) {
+      localStorage.removeItem('corner26_group_matches_v1');
+      localStorage.removeItem('corner26_knockout_matches_v1');
+      setGroupMatches(initialGroupMatches.map(m => ({ ...m, team1Score: null, team2Score: null, completed: false })));
+      setKnockoutMatches(initialKnockoutMatchesConfig.map(m => ({ ...m, team1Score: null, team2Score: null, completed: false })));
+      setAdminMode(false);
+      setEditingMatch(null);
+    }
+  };
+
+  const openKoMatchEditor = (m: any) => {
+    setEditingMatch({
+      id: m.id,
+      isKnockout: true,
+      team1Name: m.team1?.name || m.team1Placeholder || 'TBD',
+      team2Name: m.team2?.name || m.team2Placeholder || 'TBD',
+      team1Score: m.team1Score,
+      team2Score: m.team2Score,
+      completed: m.completed,
+      penalties1: m.penalties1,
+      penalties2: m.penalties2
+    });
+  };
   
   // Group filter for Fixtures section
   const [selectedGroupFilter, setSelectedGroupFilter] = useState<'ALL' | string>('ALL');
@@ -63,7 +199,7 @@ export default function App() {
   }, [groupMatches, knockoutMatches, resolvedKnockout.champion]);
 
   // Group list
-  const groupIds = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
+  const groupIds = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
   // Safe helper to find team info
   const getTeamById = (id: number): Team => {
@@ -101,8 +237,148 @@ export default function App() {
     );
   };
 
+  if (currentPath === '/admin' && !isAdminLoggedIn) {
+    return (
+      <div className="min-h-screen bg-[#0c0014] text-slate-100 football-pitch overflow-x-hidden flex flex-col justify-between selection:bg-[#ee005f] selection:text-white pb-8 relative">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-40 bg-[#ee005f]/15 rounded-full blur-[100px] pointer-events-none" />
+        
+        <header className="w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800 py-4 px-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-fuchsia-500/10 border border-fuchsia-500/30 rounded-xl">
+              <Trophy className="w-5 h-5 text-fuchsia-400" />
+            </div>
+            <div>
+              <span className="text-[10px] uppercase tracking-widest font-extrabold bg-blue-600 px-1.5 py-0.5 rounded text-white font-mono">
+                CORNER 26'
+              </span>
+              <span className="text-xs font-bold text-slate-400 font-sans block">UDSF NSSCE eFootball</span>
+            </div>
+          </div>
+          <button 
+            onClick={() => {
+              window.history.pushState({}, '', '/');
+              setCurrentPath('/');
+            }}
+            className="text-xs font-mono font-bold px-3 py-1.5 rounded-lg border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-900 transition-all cursor-pointer"
+          >
+            ← Public Portal
+          </button>
+        </header>
+
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full max-w-sm bg-slate-900/95 border border-slate-800 rounded-3xl p-8 shadow-[0_0_50px_rgba(0,0,0,0.8)] space-y-6 backdrop-blur-sm">
+            <div className="text-center space-y-2">
+              <div className="inline-flex items-center justify-center p-3 rounded-full bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 mb-2">
+                <Shield className="w-8 h-8 animate-pulse" />
+              </div>
+              <h2 className="text-xl font-black tracking-wider uppercase text-white font-mono">
+                ADMINISTRATOR LOGIN
+              </h2>
+              <p className="text-xs text-slate-400">
+                Authorized credentials required to access the score management consoles.
+              </p>
+            </div>
+
+            {loginError && (
+              <div className="p-3 bg-red-400/10 border border-red-500/20 rounded-xl text-center text-xs text-red-200 font-semibold tracking-wide flex items-center justify-center gap-2">
+                <span>⚠️</span>
+                <span>{loginError}</span>
+              </div>
+            )}
+
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              if (loginEmail === 'admin12@corner.com' && loginPassword === 'corner#admin$5') {
+                setIsAdminLoggedIn(true);
+                setAdminMode(true);
+                sessionStorage.setItem('corner26_admin_logged_in_v1', 'true');
+                setLoginError('');
+              } else {
+                setLoginError('Invalid administrator credentials.');
+              }
+            }} className="space-y-4">
+              <div>
+                <label className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block mb-1.55">
+                  Email Address
+                </label>
+                <input 
+                  type="email"
+                  required
+                  placeholder="admin@example.com"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm font-semibold text-white placeholder:text-slate-600 focus:outline-none focus:border-fuchsia-500 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block mb-1.55">
+                  Password
+                </label>
+                <input 
+                  type="password"
+                  required
+                  placeholder="••••••••••••"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm font-semibold text-white placeholder:text-slate-600 focus:outline-none focus:border-fuchsia-500 transition-colors"
+                />
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  className="w-full py-3 rounded-xl text-xs font-mono font-bold bg-[#ee005f] hover:bg-[#ff1f7b] text-white font-black shadow-[0_0_25px_rgba(238,0,95,0.25)] transition-all cursor-pointer"
+                >
+                  Authenticate Session
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <footer className="w-full text-center text-[10px] font-mono text-slate-550">
+          UDSF NSSCE • © 2026 CORNER 26' • ALL RIGHTS RESERVED
+        </footer>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0c0014] text-slate-100 football-pitch overflow-x-hidden selection:bg-[#ee005f] selection:text-white">
+      
+      {/* 🔴 Active Session Bar for logged in admin */}
+      {currentPath === '/admin' && isAdminLoggedIn && (
+        <div className="bg-emerald-500 text-slate-950 px-4 py-2 text-xs font-semibold font-mono flex items-center justify-between shadow-lg relative z-50">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-slate-950 animate-pulse inline-block shrink-0" />
+            <span>SESSION: admin12@corner.com (ADMIN PRIVILEGES CHANNELS LIVE)</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                window.history.pushState({}, '', '/');
+                setCurrentPath('/');
+              }}
+              className="px-2.5 py-1 rounded bg-slate-950 text-emerald-400 text-[10px] font-bold hover:bg-slate-900 transition-all cursor-pointer"
+            >
+              Public Mode
+            </button>
+            <button
+              onClick={() => {
+                setIsAdminLoggedIn(false);
+                setAdminMode(false);
+                sessionStorage.removeItem('corner26_admin_logged_in_v1');
+                window.history.pushState({}, '', '/');
+                setCurrentPath('/');
+              }}
+              className="px-2.5 py-1 rounded bg-red-600 text-white text-[10px] font-bold hover:bg-rose-700 transition-all cursor-pointer"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+      )}
       
       {/* Dynamic Confetti Shower for Champion Decided state */}
       {resolvedKnockout.champion && (
@@ -149,7 +425,7 @@ export default function App() {
                 <span className="text-[10px] uppercase tracking-widest font-extrabold bg-blue-600 px-1.5 py-0.5 rounded text-white font-mono">
                   CORNER 26'
                 </span>
-                <span className="text-[10px] text-slate-400 font-mono">FIFA GLOBAL</span>
+                <span className="text-[10px] text-slate-400 font-mono">UDSF NSSCE</span>
               </div>
               <h1 className="text-base font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-400 via-white to-sky-400">
                 EFOOTBALL TOURNAMENT
@@ -158,15 +434,15 @@ export default function App() {
           </div>
 
           {/* Quick Header Progress Stats */}
-          <div className="hidden lg:flex items-center gap-6">
-            <div className="text-right">
+          <div className="flex items-center gap-6">
+            <div className="hidden lg:block text-right">
               <span className="text-xs text-slate-400 block font-mono uppercase tracking-widest">Live Stage</span>
               <span className="text-sm font-bold text-[#00E536] font-sans tracking-wide">
                 {liveStats.stageName}
               </span>
             </div>
-            <div className="h-8 w-px bg-slate-800"></div>
-            <div className="w-48 text-right">
+            <div className="hidden lg:block h-8 w-px bg-slate-800"></div>
+            <div className="hidden lg:block w-48 text-right">
               <div className="flex justify-between text-xs font-mono text-slate-400 mb-1">
                 <span>PROGRESS</span>
                 <span>{liveStats.totalCompleted}/{liveStats.totalMatches} MATCHES</span>
@@ -178,6 +454,36 @@ export default function App() {
                 ></div>
               </div>
             </div>
+            <div className="h-8 w-px bg-slate-800 hidden lg:block"></div>
+            
+            {currentPath === '/admin' && isAdminLoggedIn && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setAdminMode(!adminMode)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 border transition-all ${
+                    adminMode 
+                      ? 'bg-rose-500 border-rose-400 text-slate-950 shadow-[0_0_15px_rgba(244,63,94,0.4)]' 
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                  }`}
+                  title="Toggle Editing Mode to update scores"
+                  id="admin-mode-toggle"
+                >
+                  <Settings className={`w-3.5 h-3.5 ${adminMode ? 'animate-spin' : ''}`} />
+                  <span>{adminMode ? 'EDIT: ON' : 'EDIT SCORE'}</span>
+                </button>
+
+                {adminMode && (
+                  <button
+                    onClick={handleResetTournament}
+                    className="px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold bg-slate-950 border border-slate-800 text-rose-500 hover:bg-rose-500/10 hover:border-rose-500/20 transition-all"
+                    title="Reset all results to unplayed"
+                    id="tournament-reset-btn"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -230,21 +536,15 @@ export default function App() {
           </div>
 
           {/* Organizer tag */}
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4 border-y border-slate-800/60 py-6 max-w-3xl w-full text-xs font-mono tracking-widest uppercase text-slate-400">
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-center gap-12 border-y border-slate-800/60 py-6 max-w-3xl w-full text-xs font-mono tracking-widest uppercase text-slate-400">
             <div className="flex flex-col items-center justify-center p-2">
               <span className="text-[10px] text-slate-500 block mb-1">Organized By</span>
-              <span className="font-bold text-white tracking-wide">FIFA 26</span>
-              <span className="text-[9px] text-slate-500 tracking-normal normal-case mt-0.5">United Democratic Students Front</span>
+              <span className="font-bold text-white tracking-wide text-lg">UDSF NSSCE</span>
             </div>
-            <div className="flex flex-col items-center justify-center p-2 border-y md:border-y-0 md:border-x border-slate-800/60">
-              <span className="text-[10px] text-slate-500 block mb-1">Venue Host</span>
-              <span className="font-bold text-fuchsia-400 tracking-wide text-center">FIFA ESPORTS ARENA</span>
-              <span className="text-[9px] text-slate-500 tracking-normal normal-case mt-0.5">Palakkad, Kerala</span>
-            </div>
+            <div className="hidden md:block w-px h-12 bg-slate-800/60"></div>
             <div className="flex flex-col items-center justify-center p-2">
-              <span className="text-[10px] text-slate-500 block mb-1">eSports Partner</span>
-              <span className="font-bold text-sky-400 tracking-wide">ROAD TO FIFA 26</span>
-              <span className="text-[9px] text-slate-500 tracking-normal normal-case mt-0.5">Gaming Guild</span>
+              <span className="text-[10px] text-slate-500 block mb-1">Presented By</span>
+              <span className="font-bold text-fuchsia-400 tracking-wide text-lg">CORNER 26'</span>
             </div>
           </div>
 
@@ -284,7 +584,7 @@ export default function App() {
               </div>
               <div>
                 <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">Total Teams</span>
-                <span className="text-3xl font-extrabold font-mono text-white">48 Teams</span>
+                <span className="text-3xl font-extrabold font-mono text-white">32 Teams</span>
                 <span className="text-xs text-slate-400 block mt-1">Competitive Players</span>
               </div>
             </div>
@@ -296,8 +596,8 @@ export default function App() {
               </div>
               <div>
                 <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">Group Division</span>
-                <span className="text-3xl font-extrabold font-mono text-white">12 Groups</span>
-                <span className="text-xs text-slate-400 block mt-1">A through L brackets</span>
+                <span className="text-3xl font-extrabold font-mono text-white">8 Groups</span>
+                <span className="text-xs text-slate-400 block mt-1">A through H brackets</span>
               </div>
             </div>
 
@@ -321,7 +621,7 @@ export default function App() {
               <div>
                 <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">Qualification</span>
                 <span className="text-3xl font-extrabold font-mono text-fuchsia-400">Top 2 Teams</span>
-                <span className="text-xs text-slate-400 block mt-1">Advance to Round of 24</span>
+                <span className="text-xs text-slate-400 block mt-1">Advance to Round of 16</span>
               </div>
             </div>
           </div>
@@ -394,6 +694,7 @@ export default function App() {
                   key={id}
                   groupId={id}
                   standings={groupStandings[id] || []}
+                  groupMatches={groupMatches}
                 />
               ))}
             </div>
@@ -402,6 +703,7 @@ export default function App() {
               <GroupStandingTableCard 
                 groupId={activeGroupTab}
                 standings={groupStandings[activeGroupTab] || []}
+                groupMatches={groupMatches}
               />
             </div>
           )}
@@ -485,8 +787,8 @@ export default function App() {
               .map(m => {
                 const team1 = getTeamById(m.team1Id);
                 const team2 = getTeamById(m.team2Id);
-                const isT1Winner = m.completed && m.homeScore !== null && m.awayScore !== null && m.homeScore > m.awayScore;
-                const isT2Winner = m.completed && m.homeScore !== null && m.awayScore !== null && m.awayScore > m.homeScore;
+                const isT1Winner = m.completed && m.team1Score !== null && m.team2Score !== null && m.team1Score > m.team2Score;
+                const isT2Winner = m.completed && m.team1Score !== null && m.team2Score !== null && m.team2Score > m.team1Score;
 
                 return (
                   <div 
@@ -500,7 +802,7 @@ export default function App() {
                     {/* Top Group Marker Header */}
                     <div className="flex justify-between items-center bg-slate-900/50 px-4 py-2 border-b border-slate-850 text-[10px] font-mono uppercase tracking-widest text-slate-400">
                       <span>GROUP {m.group} Stage</span>
-                      <span className={`f-semibold ${m.completed ? 'text-fuchsia-400' : 'text-yellow-500'}`}>
+                      <span className={`font-semibold ${m.completed ? 'text-fuchsia-400' : 'text-yellow-500'}`}>
                         {m.completed ? 'Match Played' : 'Upcoming'}
                       </span>
                     </div>
@@ -543,6 +845,24 @@ export default function App() {
                           </span>
                         </div>
                       </div>
+
+                      {currentPath === '/admin' && isAdminLoggedIn && adminMode && (
+                        <button
+                          onClick={() => setEditingMatch({
+                            id: m.id,
+                            isKnockout: false,
+                            team1Name: team1.name,
+                            team2Name: team2.name,
+                            team1Score: m.team1Score,
+                            team2Score: m.team2Score,
+                            completed: m.completed
+                          })}
+                          className="w-full py-1.5 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400 hover:bg-[#00E536] hover:border-[#00E536]/40 hover:text-slate-950 font-mono text-[10px] font-bold tracking-wider transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Settings className="w-3 h-3" />
+                          UPDATE RESULT
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
@@ -639,37 +959,23 @@ export default function App() {
           </div>
 
           <div className="w-full overflow-x-auto pb-6 pt-4 scrollbar-thin scrollbar-thumb-slate-800">
-            {/* The Bracket Core grid columns representing stages: R24 -> R16 -> QF -> SF -> F -> Champion */}
-            <div className="min-w-[1400px] grid grid-cols-5 gap-8 items-stretch relative px-2">
+            {/* The Bracket Core grid columns representing stages: R16 -> QF -> SF -> F -> Champion */}
+            <div className="min-w-[1250px] grid grid-cols-5 gap-8 items-stretch relative px-2">
               
-              {/* ROUND OF 24 (8 matches) */}
-              <div className="flex flex-col justify-around space-y-6">
-                <div className="text-center py-2 bg-slate-900 border border-slate-800 rounded-lg">
-                  <span className="text-xs font-extrabold text-indigo-400 uppercase tracking-widest font-mono">
-                    Round of 24
-                  </span>
-                  <p className="text-[9px] text-slate-500 mt-0.5">16 teams (Group Winners & RUs)</p>
-                </div>
-                {resolvedKnockout.r24Matches.map((m, idx) => (
-                  <BracketMatchCard 
-                    key={m.id} 
-                    match={m}
-                  />
-                ))}
-              </div>
-
               {/* ROUND OF 16 (8 matches) */}
               <div className="flex flex-col justify-around space-y-6">
                 <div className="text-center py-2 bg-slate-900 border border-slate-800 rounded-lg">
                   <span className="text-xs font-extrabold text-blue-400 uppercase tracking-widest font-mono">
                     Round of 16
                   </span>
-                  <p className="text-[9px] text-slate-500 mt-0.5">8 Auto Byes + 8 Winners R24</p>
+                  <p className="text-[9px] text-slate-500 mt-0.5">16 teams (Group Winners & RUs)</p>
                 </div>
                 {resolvedKnockout.r16Matches.map((m, idx) => (
                   <BracketMatchCard 
                     key={m.id} 
                     match={m}
+                    adminMode={adminMode}
+                    onEdit={() => openKoMatchEditor(m)}
                   />
                 ))}
               </div>
@@ -686,6 +992,8 @@ export default function App() {
                   <BracketMatchCard 
                     key={m.id} 
                     match={m}
+                    adminMode={adminMode}
+                    onEdit={() => openKoMatchEditor(m)}
                   />
                 ))}
               </div>
@@ -702,6 +1010,8 @@ export default function App() {
                   <BracketMatchCard 
                     key={m.id} 
                     match={m}
+                    adminMode={adminMode}
+                    onEdit={() => openKoMatchEditor(m)}
                   />
                 ))}
               </div>
@@ -719,6 +1029,8 @@ export default function App() {
                 {resolvedKnockout.finalMatch && (
                   <BracketMatchCard 
                     match={resolvedKnockout.finalMatch}
+                    adminMode={adminMode}
+                    onEdit={() => openKoMatchEditor(resolvedKnockout.finalMatch)}
                   />
                 )}
 
@@ -806,7 +1118,7 @@ export default function App() {
               </span>
             </div>
             <p className="text-[11px] text-slate-500 mt-2 relative z-10">
-              Official FIFA 26 Esports Hub.
+              UDSF NSSCE Live eFootball Arena.
             </p>
           </div>
         </section>
@@ -851,7 +1163,7 @@ export default function App() {
                       Recipient of a personalized official jersey representing the champion player's selected pro team!
                     </p>
                     <span className="text-[10px] text-slate-500 block mt-4 font-mono font-bold">
-                      Organized by United Democratic Students Front
+                      Organized by UDSF NSSCE
                     </span>
                   </div>
                 </>
@@ -911,9 +1223,9 @@ export default function App() {
                 ORGANIZERS & GUILD
               </span>
               <div className="text-xs text-slate-400 space-y-1">
-                <p className="font-semibold text-white">FIFA 26 Esports Organization</p>
-                <p className="text-slate-500">Official World Cup Gaming League</p>
-                <p className="font-semibold text-sky-400 mt-1">FIFA 26 WORLD CUP E-SPORTS</p>
+                <p className="font-semibold text-white">UDSF NSSCE</p>
+                <p className="text-slate-500">NSS College of Engineering, Palakkad</p>
+                <p className="font-semibold text-sky-400 mt-1">eFootball Tournament</p>
               </div>
             </div>
 
@@ -937,13 +1249,227 @@ export default function App() {
               © 2026 CORNER 26'. All rights preserved. Made with ❤️ for football lovers.
             </p>
             <div className="flex items-center gap-4 text-[11px]">
-              <span>FIFA • 2026</span>
+              <span>UDSF • NSSCE</span>
               <span>•</span>
-              <span className="text-fuchsia-400 font-bold">ROAD TO FIFA 26</span>
             </div>
           </div>
         </div>
       </footer>
+
+      {/* 11. MATCH CONSOLE SCORE EDITOR MODAL */}
+      {editingMatch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in" id="score-editor-modal">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] relative">
+            
+            {/* Modal Header */}
+            <div className="px-6 py-4 bg-slate-950 border-b border-slate-850 flex items-center justify-between">
+              <span className="font-extrabold tracking-wider text-xs font-mono text-slate-400 flex items-center gap-2">
+                <Settings className="w-4 h-4 text-fuchsia-400 animate-spin" />
+                {editingMatch.isKnockout ? 'KNOCKOUT CONSOLE' : 'GROUP CONSOLE'}
+              </span>
+              <button 
+                onClick={() => setEditingMatch(null)}
+                className="text-slate-500 hover:text-white transition-colors text-lg"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Form Content */}
+            <div className="p-6 space-y-6">
+              
+              {/* Score Input Matchup header */}
+              <div className="text-center space-y-1">
+                <span className="text-[10px] font-mono text-[#00f0ff] uppercase tracking-widest font-extrabold block">
+                  Active Fixture Score Entry
+                </span>
+                <div className="flex items-center justify-between gap-4 py-2">
+                  <div className="flex-1 text-right">
+                    <p className="text-sm font-black text-white truncate">{editingMatch.team1Name}</p>
+                    <span className="text-[9px] font-mono text-slate-500">HOMETEAM</span>
+                  </div>
+                  <div className="px-3 py-1 bg-slate-950 border border-slate-850 rounded-lg text-xs font-mono text-slate-400 font-bold shrink-0">
+                    VS
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="text-sm font-black text-white truncate">{editingMatch.team2Name}</p>
+                    <span className="text-[9px] font-mono text-slate-500">AWAYTEAM</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Played status toggle */}
+              <div className="flex items-center justify-between p-3.5 bg-slate-950/50 border border-slate-850/60 rounded-2xl mx-1">
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold block text-slate-100">Match Completed</span>
+                  <span className="text-[10px] text-slate-500 font-mono">Has this fixture been played?</span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={editingMatch.completed} 
+                    onChange={(e) => setEditingMatch({ ...editingMatch, completed: e.target.checked, team1Score: e.target.checked ? (editingMatch.team1Score ?? 0) : null, team2Score: e.target.checked ? (editingMatch.team2Score ?? 0) : null })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-gray-305 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00E536] peer-checked:after:bg-slate-950"></div>
+                </label>
+              </div>
+
+              {/* Interactive Score Steppers */}
+              {editingMatch.completed && (
+                <div className="space-y-4">
+                  
+                  {/* Goals inputs */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Team 1 Score */}
+                    <div className="bg-slate-950/40 p-3 rounded-2xl border border-slate-850/50 space-y-2 flex flex-col items-center">
+                      <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest font-bold">Goals Home</span>
+                      <div className="flex items-center gap-3">
+                        <button 
+                          onClick={() => {
+                            const cur = editingMatch.team1Score ?? 0;
+                            setEditingMatch({ ...editingMatch, team1Score: Math.max(0, cur - 1) });
+                          }}
+                          className="w-8 h-8 rounded-full bg-slate-900 border border-slate-850 hover:bg-slate-800 flex items-center justify-center text-sm font-bold cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <input 
+                          type="number"
+                          value={editingMatch.team1Score ?? 0}
+                          min="0"
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value) || 0;
+                            setEditingMatch({ ...editingMatch, team1Score: Math.max(0, val) });
+                          }}
+                          className="w-12 text-center bg-transparent border-b border-slate-800 text-lg font-extrabold font-mono text-white focus:border-fuchsia-500 focus:outline-none"
+                        />
+                        <button 
+                          onClick={() => {
+                            const cur = editingMatch.team1Score ?? 0;
+                            setEditingMatch({ ...editingMatch, team1Score: cur + 1 });
+                          }}
+                          className="w-8 h-8 rounded-full bg-slate-900 border border-slate-850 hover:bg-slate-800 flex items-center justify-center text-sm font-bold cursor-pointer"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Team 2 Score */}
+                    <div className="bg-slate-950/40 p-3 rounded-2xl border border-slate-850/50 space-y-2 flex flex-col items-center">
+                      <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest font-bold">Goals Away</span>
+                      <div className="flex items-center gap-3">
+                        <button 
+                          onClick={() => {
+                            const cur = editingMatch.team2Score ?? 0;
+                            setEditingMatch({ ...editingMatch, team2Score: Math.max(0, cur - 1) });
+                          }}
+                          className="w-8 h-8 rounded-full bg-slate-900 border border-slate-850 hover:bg-slate-800 flex items-center justify-center text-sm font-bold cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <input 
+                          type="number"
+                          value={editingMatch.team2Score ?? 0}
+                          min="0"
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value) || 0;
+                            setEditingMatch({ ...editingMatch, team2Score: Math.max(0, val) });
+                          }}
+                          className="w-12 text-center bg-transparent border-b border-slate-800 text-lg font-extrabold font-mono text-white focus:border-fuchsia-500 focus:outline-none"
+                        />
+                        <button 
+                          onClick={() => {
+                            const cur = editingMatch.team2Score ?? 0;
+                            setEditingMatch({ ...editingMatch, team2Score: cur + 1 });
+                          }}
+                          className="w-8 h-8 rounded-full bg-slate-900 border border-slate-850 hover:bg-slate-800 flex items-center justify-center text-sm font-bold cursor-pointer"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Penalty Shootout section (only for knockout draw match) */}
+                  {editingMatch.isKnockout && (editingMatch.team1Score ?? 0) === (editingMatch.team2Score ?? 0) && (
+                    <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-2xl space-y-3">
+                      <div className="text-center">
+                        <span className="text-[10px] font-mono text-amber-400 font-extrabold uppercase tracking-widest block">
+                          ⚡ PENALTY SHOOTOUT REQUIRED
+                        </span>
+                        <p className="text-[9px] text-slate-400 mt-1">Knockout stages cannot end in a draw. Register shootout scores to resolve winner.</p>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 items-center">
+                        <div className="flex flex-col items-center space-y-1">
+                          <label className="text-[8px] font-mono text-slate-500 font-bold uppercase">Home Pens</label>
+                          <input 
+                            type="number"
+                            min="0"
+                            value={editingMatch.penalties1 ?? 0}
+                            onChange={(e) => setEditingMatch({ ...editingMatch, penalties1: Math.max(0, parseInt(e.target.value) || 0) })}
+                            className="w-16 text-center bg-slate-950 border border-slate-800 rounded px-2 py-1 text-sm font-bold font-mono text-amber-400"
+                          />
+                        </div>
+                        <div className="flex flex-col items-center space-y-1">
+                          <label className="text-[8px] font-mono text-slate-500 font-bold uppercase">Away Pens</label>
+                          <input 
+                            type="number"
+                            min="0"
+                            value={editingMatch.penalties2 ?? 0}
+                            onChange={(e) => setEditingMatch({ ...editingMatch, penalties2: Math.max(0, parseInt(e.target.value) || 0) })}
+                            className="w-16 text-center bg-slate-950 border border-slate-800 rounded px-2 py-1 text-sm font-bold font-mono text-amber-400"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+              )}
+
+              {/* Status information if unplayed */}
+              {!editingMatch.completed && (
+                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-850 text-center text-xs text-slate-500 tracking-wide font-mono leading-relaxed">
+                  ⏸ Match is marked as <span className="text-rose-400 font-bold">Upcoming / Pending</span>. Saving will clear previous scores, resetting the standing calculations and parent brackets.
+                </div>
+              )}
+
+              {/* CTA buttons */}
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingMatch(null)}
+                  className="w-full py-2.5 bg-slate-950 border border-slate-850 hover:bg-slate-900 rounded-xl text-xs font-mono font-bold text-slate-400 hover:text-white transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleSaveMatch(
+                      editingMatch.id,
+                      editingMatch.isKnockout,
+                      editingMatch.team1Score,
+                      editingMatch.team2Score,
+                      editingMatch.completed,
+                      editingMatch.penalties1,
+                      editingMatch.penalties2
+                    );
+                  }}
+                  className="w-full py-2.5 rounded-xl text-xs font-mono font-bold bg-gradient-to-r from-[#ee005f] to-[#00f0ff] hover:from-[#f31a72] hover:to-[#21f3ff] text-slate-950 font-black shadow-[0_0_20px_rgba(238,0,95,0.2)] transition-all cursor-pointer"
+                >
+                  Save Result
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );
@@ -955,9 +1481,14 @@ interface GroupStandingCardProps {
   key?: React.Key | string;
   groupId: string;
   standings: Standing[];
+  groupMatches: Match[];
 }
 
-function GroupStandingTableCard({ groupId, standings }: GroupStandingCardProps) {
+function GroupStandingTableCard({ groupId, standings, groupMatches }: GroupStandingCardProps) {
+  // Check if group is fully completed
+  const groupMatchesFiltered = groupMatches.filter(m => m.group === groupId);
+  const isGroupCompleted = groupMatchesFiltered.length > 0 && groupMatchesFiltered.every(m => m.completed);
+
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/10 overflow-hidden backdrop-blur-md">
       {/* Group Header Title */}
@@ -966,8 +1497,8 @@ function GroupStandingTableCard({ groupId, standings }: GroupStandingCardProps) 
           <span className="w-1.5 h-3 bg-fuchsia-400 rounded-full inline-block"></span>
           GROUP {groupId}
         </span>
-        <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20">
-          Group Stage
+        <span className={`text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full border ${isGroupCompleted ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20'}`}>
+          {isGroupCompleted ? 'COMPLETED' : 'PLAYING'}
         </span>
       </div>
 
@@ -975,7 +1506,7 @@ function GroupStandingTableCard({ groupId, standings }: GroupStandingCardProps) 
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-slate-850 bg-slate-950/20 text-[10px] font-mono text-slate-400 uppercase font-extrabold">
+            <tr className="border-b border-slate-850 bg-slate-950/20 text-[10px] font-mono text-slate-400 uppercase font-extrabold font-sans">
               <th className="py-2.5 px-3 text-center">POS</th>
               <th className="py-2.5 px-2">TEAM</th>
               <th className="py-2.5 px-1.5 text-center">GP</th>
@@ -988,8 +1519,7 @@ function GroupStandingTableCard({ groupId, standings }: GroupStandingCardProps) 
           </thead>
           <tbody>
             {standings.map((s, idx) => {
-              const isQualified = idx < 2; // Top 2 qualify
-              const hasPlayed = s.played > 0;
+              const isQualified = idx < 2 && isGroupCompleted; // Top 2 qualify ONLY once group is completed
               return (
                 <tr 
                   key={s.team.id}
@@ -1013,7 +1543,7 @@ function GroupStandingTableCard({ groupId, standings }: GroupStandingCardProps) 
                   </td>
 
                   {/* Team Name */}
-                  <td className="py-2.5 px-2 font-bold max-w-[120px] truncate" title={s.team.name}>
+                  <td className="py-2.5 px-2 font-bold max-w-[125px] truncate" title={s.team.name}>
                     <div className="flex flex-col">
                       <span className="text-slate-100 font-sans tracking-wide leading-tight text-xs truncate">
                         {s.team.name}
@@ -1066,6 +1596,8 @@ interface BracketMatchProps {
     title: string;
     team1: { id: number; name: string; shortName: string; source: string; color: string } | null;
     team2: { id: number; name: string; shortName: string; source: string; color: string } | null;
+    team1Placeholder?: string;
+    team2Placeholder?: string;
     team1Score: number | null;
     team2Score: number | null;
     penalties1?: number | null;
@@ -1074,9 +1606,11 @@ interface BracketMatchProps {
     winner: { id: number; name: string; shortName: string; source: string; color: string } | null;
     isTied: boolean;
   };
+  adminMode?: boolean;
+  onEdit?: () => void;
 }
 
-function BracketMatchCard({ match }: BracketMatchProps) {
+function BracketMatchCard({ match, adminMode, onEdit }: BracketMatchProps) {
   const isT1Winner = match.completed && match.team1Score !== null && match.team2Score !== null && (
     match.team1Score > match.team2Score || (match.team1Score === match.team2Score && match.penalties1 !== undefined && match.penalties2 !== undefined && match.penalties1 !== null && match.penalties2 !== null && match.penalties1 > match.penalties2)
   );
@@ -1091,7 +1625,7 @@ function BracketMatchCard({ match }: BracketMatchProps) {
       {/* Top Banner indicating title / stage progress */}
       <div className="bg-slate-950 px-3 py-1.5 border-b border-slate-850 flex items-center justify-between text-[9px] font-mono font-extrabold uppercase tracking-widest text-slate-400">
         <span>{match.title}</span>
-        <span className={match.completed ? 'text-fuchsia-400' : 'text-slate-500'}>
+        <span className={match.completed ? 'text-[#00E536]' : 'text-slate-500'}>
           {match.completed ? 'Completed' : 'PENDING'}
         </span>
       </div>
@@ -1105,12 +1639,15 @@ function BracketMatchCard({ match }: BracketMatchProps) {
                 <span className={`block text-xs font-bold truncate leading-tight ${isT1Winner ? 'text-white' : match.completed ? 'text-slate-500' : 'text-slate-200'}`}>
                   {match.team1.name}
                 </span>
-                <span className="text-[8px] font-mono text-slate-500 block leading-tight truncate">
+                <span className="text-[8px] font-mono text-slate-500 block leading-none truncate">
                   {match.team1.source}
                 </span>
               </>
             ) : (
-              <span className="text-xs text-slate-500 italic block">Team To Be Decided</span>
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-mono text-slate-450 block font-bold leading-none truncate">{match.team1Placeholder || 'TBD'}</span>
+                <span className="text-[8px] font-mono text-slate-500 block leading-none">Slot Pending</span>
+              </div>
             )}
           </div>
           
@@ -1120,7 +1657,7 @@ function BracketMatchCard({ match }: BracketMatchProps) {
                 ({match.penalties1})
               </span>
             )}
-            <span className={`w-8 text-center text-sm font-extrabold font-mono ${isT1Winner ? 'text-fuchsia-400' : 'text-slate-200'}`}>
+            <span className={`w-8 text-center text-sm font-extrabold font-mono ${isT1Winner ? 'text-[#00E536]' : 'text-slate-200'}`}>
               {match.completed && match.team1Score !== null ? match.team1Score : '-'}
             </span>
           </div>
@@ -1134,12 +1671,15 @@ function BracketMatchCard({ match }: BracketMatchProps) {
                 <span className={`block text-xs font-bold truncate leading-tight ${isT2Winner ? 'text-white' : match.completed ? 'text-slate-500' : 'text-slate-200'}`}>
                   {match.team2.name}
                 </span>
-                <span className="text-[8px] font-mono text-slate-500 block leading-tight truncate">
+                <span className="text-[8px] font-mono text-slate-500 block leading-none truncate">
                   {match.team2.source}
                 </span>
               </>
             ) : (
-              <span className="text-xs text-slate-500 italic block">Team To Be Decided</span>
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-mono text-slate-455 block font-bold leading-none truncate">{match.team2Placeholder || 'TBD'}</span>
+                <span className="text-[8px] font-mono text-slate-500 block leading-none">Slot Pending</span>
+              </div>
             )}
           </div>
 
@@ -1149,11 +1689,23 @@ function BracketMatchCard({ match }: BracketMatchProps) {
                 ({match.penalties2})
               </span>
             )}
-            <span className={`w-8 text-center text-sm font-extrabold font-mono ${isT2Winner ? 'text-fuchsia-400' : 'text-slate-200'}`}>
+            <span className={`w-8 text-center text-sm font-extrabold font-mono ${isT2Winner ? 'text-[#00E536]' : 'text-slate-200'}`}>
               {match.completed && match.team2Score !== null ? match.team2Score : '-'}
             </span>
           </div>
         </div>
+
+        {/* Inline edit button for knockout matches */}
+        {adminMode && onEdit && (
+          <button
+            onClick={onEdit}
+            className="w-full mt-2 py-1.5 bg-rose-500/10 border border-rose-500/35 rounded-lg text-[10px] font-mono font-bold text-rose-400 hover:bg-[#ee005f] hover:border-[#ee005f] hover:text-slate-920 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <Settings className="w-3 h-3" />
+            UPDATE BRACKET
+          </button>
+        )}
+
       </div>
     </div>
   );

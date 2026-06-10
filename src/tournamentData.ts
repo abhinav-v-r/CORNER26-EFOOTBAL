@@ -1,10 +1,6 @@
 /**
- * CORNER 26' PRESENTS EFOOTBALL TOURNAMENT
+ * OFFICIAL FIFA WORLD CUP ESPORTS
  * Core static data and user-editable tournament states.
- * 
- * ADMIN MANUAL:
- * To update the tournament results, simply edit the score values and 'completed' flags below.
- * Standings, knockout brackets, live stats, and the Champion section will automatically update!
  */
 
 export interface Team {
@@ -27,7 +23,7 @@ export interface Match {
 
 export interface KnockoutMatch {
   id: string;
-  stage: 'r24' | 'r16' | 'qf' | 'sf' | 'f';
+  stage: 'r16' | 'qf' | 'sf' | 'f';
   title: string;
   // User-editable scores for each knockout slot
   team1Score: number | null;
@@ -38,62 +34,88 @@ export interface KnockoutMatch {
   penalties2?: number | null;
 }
 
-// 48 TEAMS across 12 Groups (A to L, 4 teams per group)
-export const teams: Team[] = [];
+export const teams: Team[] = [
+  // GROUP A
+  { id: 1, name: 'Mexico', shortName: 'MEX', group: 'A', color: '#006847' },
+  { id: 2, name: 'France', shortName: 'FRA', group: 'A', color: '#002654' },
+  { id: 3, name: 'Japan', shortName: 'JPN', group: 'A', color: '#000555' },
+  { id: 4, name: 'Argentina', shortName: 'ARG', group: 'A', color: '#43A1D5' },
 
-/**
- * GROUP MATCHES (Total 72 Matches - Round Robin inside 12 Groups)
- * 
- * ADMIN INSTRUCTIONS:
- * Modify 'team1Score', 'team2Score', and set 'completed: false' to record tournament scores.
- * Standings & Knockout brackets recalculate in real-time.
- */
+  // GROUP B
+  { id: 5, name: 'Uruguay', shortName: 'URU', group: 'B', color: '#0038A8' },
+  { id: 6, name: 'Spain', shortName: 'ESP', group: 'B', color: '#AA151B' },
+  { id: 7, name: 'Brazil', shortName: 'BRA', group: 'B', color: '#009B3A' },
+  { id: 8, name: 'Denmark', shortName: 'DEN', group: 'B', color: '#C60C30' },
+
+  // GROUP C
+  { id: 9, name: 'Croatia', shortName: 'CRO', group: 'C', color: '#FF0000' },
+  { id: 10, name: 'Portugal', shortName: 'POR', group: 'C', color: '#006600' },
+  { id: 11, name: 'Netherlands', shortName: 'NED', group: 'C', color: '#F36C21' },
+  { id: 12, name: 'Morocco', shortName: 'MAR', group: 'C', color: '#C1272D' },
+
+  // GROUP D
+  { id: 13, name: 'Saudi Arabia', shortName: 'KSA', group: 'D', color: '#006C35' },
+  { id: 14, name: 'Qatar', shortName: 'QAT', group: 'D', color: '#8A1538' },
+  { id: 15, name: 'Turkey', shortName: 'TUR', group: 'D', color: '#E30A17' },
+  { id: 16, name: 'Ivory Coast', shortName: 'CIV', group: 'D', color: '#F77F00' },
+
+  // GROUP E
+  { id: 17, name: 'Belgium', shortName: 'BEL', group: 'E', color: '#EF3340' },
+  { id: 18, name: 'England', shortName: 'ENG', group: 'E', color: '#FFFFFF' },
+  { id: 19, name: 'Germany', shortName: 'GER', group: 'E', color: '#000000' },
+  { id: 20, name: 'Colombia', shortName: 'COL', group: 'E', color: '#FCD116' },
+
+  // GROUP F
+  { id: 21, name: 'Norway', shortName: 'NOR', group: 'F', color: '#BA0C2F' },
+  { id: 22, name: 'Scotland', shortName: 'SCO', group: 'F', color: '#005EB8' },
+  { id: 23, name: 'Senegal', shortName: 'SEN', group: 'F', color: '#00853F' },
+  { id: 24, name: 'Paraguay', shortName: 'PAR', group: 'F', color: '#D52B1E' },
+
+  // GROUP G
+  { id: 25, name: 'USA', shortName: 'USA', group: 'G', color: '#002868' },
+  { id: 26, name: 'Switzerland', shortName: 'SUI', group: 'G', color: '#FF0000' },
+  { id: 27, name: 'Sweden', shortName: 'SWE', group: 'G', color: '#FECC02' },
+  { id: 28, name: 'Egypt', shortName: 'EGY', group: 'G', color: '#CE1126' },
+
+  // GROUP H
+  { id: 29, name: 'South Korea', shortName: 'KOR', group: 'H', color: '#C60C30' },
+  { id: 30, name: 'Iran', shortName: 'IRN', group: 'H', color: '#239F40' },
+  { id: 31, name: 'Canada', shortName: 'CAN', group: 'H', color: '#FF0000' },
+  { id: 32, name: 'Australia', shortName: 'AUS', group: 'H', color: '#FFCD00' }
+];
+
 export const groupMatches: Match[] = [];
+// Generate round-robin matches for each group
+let matchIdCounter = 1;
+const groups = ['A','B','C','D','E','F','G','H'];
+groups.forEach(g => {
+  const groupTeams = teams.filter(t => t.group === g);
+  for (let i = 0; i < groupTeams.length; i++) {
+    for (let j = i + 1; j < groupTeams.length; j++) {
+      groupMatches.push({
+        id: 'gm' + matchIdCounter++,
+        group: g,
+        team1Id: groupTeams[i].id,
+        team2Id: groupTeams[j].id,
+        team1Score: null,
+        team2Score: null,
+        completed: false
+      });
+    }
+  }
+});
 
-/**
- * KNOCKOUT MATCHES RESULTS
- * 
- * ADMIN INSTRUCTIONS:
- * Modify standard 'team1Score', 'team2Score' values and set 'completed: false' to record knockout scores.
- * The bracket lines and subsequent rounds will calculate automatically.
- * Use 'penalties1' and 'penalties2' (integers) if a lockout match remains tied and goes to a penalty shootout.
- */
+// For standard 32 teams (8 groups), 16 teams qualify for knockout stage
 export const knockoutMatchesConfig: KnockoutMatch[] = [
-  // --- ROUND OF 24 (8 MATCHES) ---
-  // R24 Match 1: 9th best group winner vs 12th runner-up (Winner advances to R16 to face one of top 8 byes)
-  { id: "r24-1", stage: "r24", title: "R24 Match 1", team1Score: null, team2Score: null, completed: false },
-  // R24 Match 2: 10th best group winner vs 11th runner-up
-  { id: "r24-2", stage: "r24", title: "R24 Match 2", team1Score: null, team2Score: null, completed: false },
-  // R24 Match 3: 11th best group winner vs 10th runner-up
-  { id: "r24-3", stage: "r24", title: "R24 Match 3", team1Score: null, team2Score: null, completed: false },
-  // R24 Match 4: 12th best group winner vs 9th runner-up
-  { id: "r24-4", stage: "r24", title: "R24 Match 4", team1Score: null, team2Score: null, completed: false }, // Penalty shootout!
-  // R24 Match 5: 1st runner-up vs 8th runner-up
-  { id: "r24-5", stage: "r24", title: "R24 Match 5", team1Score: null, team2Score: null, completed: false },
-  // R24 Match 6: 2nd runner-up vs 7th runner-up
-  { id: "r24-6", stage: "r24", title: "R24 Match 6", team1Score: null, team2Score: null, completed: false },
-  // R24 Match 7: 3rd runner-up vs 6th runner-up
-  { id: "r24-7", stage: "r24", title: "R24 Match 7", team1Score: null, team2Score: null, completed: false },
-  // R24 Match 8: 4th runner-up vs 5th runner-up
-  { id: "r24-8", stage: "r24", title: "r24 Match 8", team1Score: null, team2Score: null, completed: false },
-
   // --- ROUND OF 16 (8 MATCHES) ---
-  // Match 1: 1st Best Bye Team vs Winner of R24 Match 1
-  { id: "r16-1", stage: "r16", title: "R16 Match 1", team1Score: null, team2Score: null, completed: false },
-  // Match 2: 2nd Best Bye Team vs Winner of R24 Match 2
-  { id: "r16-2", stage: "r16", title: "R16 Match 2", team1Score: null, team2Score: null, completed: false },
-  // Match 3: 3rd Best Bye Team vs Winner of R24 Match 3
-  { id: "r16-3", stage: "r16", title: "R16 Match 3", team1Score: null, team2Score: null, completed: false },
-  // Match 4: 4th Best Bye Team vs Winner of R24 Match 4
-  { id: "r16-4", stage: "r16", title: "R16 Match 4", team1Score: null, team2Score: null, completed: false },
-  // Match 5: 5th Best Bye Team vs Winner of R24 Match 5
-  { id: "r16-5", stage: "r16", title: "R16 Match 5", team1Score: null, team2Score: null, completed: false },
-  // Match 6: 6th Best Bye Team vs Winner of R24 Match 6
-  { id: "r16-6", stage: "r16", title: "R16 Match 6", team1Score: null, team2Score: null, completed: false },
-  // Match 7: 7th Best Bye Team vs Winner of R24 Match 7
-  { id: "r16-7", stage: "r16", title: "R16 Match 7", team1Score: null, team2Score: null, completed: false },
-  // Match 8: 8th Best Bye Team vs Winner of R24 Match 8
-  { id: "r16-8", stage: "r16", title: "R16 Match 8", team1Score: null, team2Score: null, completed: false },
+  { id: "r16-1", stage: "r16", title: "R16 Match 1 (1A vs 2B)", team1Score: null, team2Score: null, completed: false },
+  { id: "r16-2", stage: "r16", title: "R16 Match 2 (1C vs 2D)", team1Score: null, team2Score: null, completed: false },
+  { id: "r16-3", stage: "r16", title: "R16 Match 3 (1E vs 2F)", team1Score: null, team2Score: null, completed: false },
+  { id: "r16-4", stage: "r16", title: "R16 Match 4 (1G vs 2H)", team1Score: null, team2Score: null, completed: false },
+  { id: "r16-5", stage: "r16", title: "R16 Match 5 (1B vs 2A)", team1Score: null, team2Score: null, completed: false },
+  { id: "r16-6", stage: "r16", title: "R16 Match 6 (1D vs 2C)", team1Score: null, team2Score: null, completed: false },
+  { id: "r16-7", stage: "r16", title: "R16 Match 7 (1F vs 2E)", team1Score: null, team2Score: null, completed: false },
+  { id: "r16-8", stage: "r16", title: "R16 Match 8 (1H vs 2G)", team1Score: null, team2Score: null, completed: false },
 
   // --- QUARTER FINALS (4 MATCHES) ---
   { id: "qf-1", stage: "qf", title: "Quarter-Final 1", team1Score: null, team2Score: null, completed: false },
