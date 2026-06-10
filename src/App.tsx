@@ -558,10 +558,10 @@ export default function App() {
                 Grand Winner Prize ⚽👕
               </span>
               <h3 className="text-xl font-bold text-white tracking-tight leading-snug">
-                Official Premium Club Football Jersey
+                Football Jersey of your Favorite Team
               </h3>
               <p className="text-xs text-slate-300 mt-1">
-                The absolute winner receives a top-tier jersey of their favorite football club with custom name and number!
+                Rise to the top, become the champion, and wear the colors of your favorite club with pride
               </p>
             </div>
           </div>
@@ -960,98 +960,133 @@ export default function App() {
 
           <div className="w-full overflow-x-auto pb-6 pt-4 scrollbar-thin scrollbar-thumb-slate-800">
             {/* The Bracket Core grid columns representing stages: R16 -> QF -> SF -> F -> Champion */}
-            <div className="min-w-[1250px] grid grid-cols-5 gap-8 items-stretch relative px-2">
+            <div className="min-w-[1250px] grid grid-cols-5 gap-8 items-stretch relative px-2 min-h-[1150px]">
               
               {/* ROUND OF 16 (8 matches) */}
-              <div className="flex flex-col justify-around space-y-6">
-                <div className="text-center py-2 bg-slate-900 border border-slate-800 rounded-lg">
+              <div className="flex flex-col h-full">
+                <div className="text-center py-2 bg-slate-900 border border-slate-800 rounded-lg shrink-0 h-[52px] flex flex-col justify-center mb-6">
                   <span className="text-xs font-extrabold text-blue-400 uppercase tracking-widest font-mono">
                     Round of 16
                   </span>
                   <p className="text-[9px] text-slate-500 mt-0.5">16 teams (Group Winners & RUs)</p>
                 </div>
-                {resolvedKnockout.r16Matches.map((m, idx) => (
-                  <BracketMatchCard 
-                    key={m.id} 
-                    match={m}
-                    adminMode={adminMode}
-                    onEdit={() => openKoMatchEditor(m)}
-                  />
-                ))}
+                <div className="flex-1 flex flex-col justify-around py-2">
+                  {resolvedKnockout.r16Matches.map((m, idx) => (
+                    <BracketMatchCard 
+                      key={m.id} 
+                      match={m}
+                      adminMode={adminMode}
+                      onEdit={() => openKoMatchEditor(m)}
+                    />
+                  ))}
+                </div>
               </div>
 
               {/* QUARTER FINALS (4 matches) */}
-              <div className="flex flex-col justify-around space-y-12">
-                <div className="text-center py-2 bg-slate-900 border border-slate-800 rounded-lg">
+              <div className="flex flex-col h-full">
+                <div className="text-center py-2 bg-slate-900 border border-slate-800 rounded-lg shrink-0 h-[52px] flex flex-col justify-center mb-6">
                   <span className="text-xs font-extrabold text-yellow-500 uppercase tracking-widest font-mono">
                     Quarter-Finals
                   </span>
                   <p className="text-[9px] text-slate-500 mt-0.5">8 Winners of R16</p>
                 </div>
-                {resolvedKnockout.qfMatches.map((m, idx) => (
-                  <BracketMatchCard 
-                    key={m.id} 
-                    match={m}
-                    adminMode={adminMode}
-                    onEdit={() => openKoMatchEditor(m)}
-                  />
-                ))}
+                <div className="flex-1 flex flex-col justify-around py-2">
+                  {resolvedKnockout.qfMatches.map((m, idx) => (
+                    <BracketMatchCard 
+                      key={m.id} 
+                      match={m}
+                      adminMode={adminMode}
+                      onEdit={() => openKoMatchEditor(m)}
+                    />
+                  ))}
+                </div>
               </div>
 
               {/* SEMI FINALS (2 matches) */}
-              <div className="flex flex-col justify-around space-y-24">
-                <div className="text-center py-2 bg-slate-900 border border-slate-800 rounded-lg">
+              <div className="flex flex-col h-full">
+                <div className="text-center py-2 bg-slate-900 border border-slate-800 rounded-lg shrink-0 h-[52px] flex flex-col justify-center mb-6">
                   <span className="text-xs font-extrabold text-pink-500 uppercase tracking-widest font-mono">
                     Semi-Finals
                   </span>
                   <p className="text-[9px] text-slate-500 mt-0.5">Final 4 Duel</p>
                 </div>
-                {resolvedKnockout.sfMatches.map((m, idx) => (
-                  <BracketMatchCard 
-                    key={m.id} 
-                    match={m}
-                    adminMode={adminMode}
-                    onEdit={() => openKoMatchEditor(m)}
-                  />
-                ))}
+                <div className="flex-1 flex flex-col justify-around py-2">
+                  {resolvedKnockout.sfMatches.map((m, idx) => (
+                    <BracketMatchCard 
+                      key={m.id} 
+                      match={m}
+                      adminMode={adminMode}
+                      onEdit={() => openKoMatchEditor(m)}
+                    />
+                  ))}
+                </div>
               </div>
 
               {/* GRAND FINAL + CHAMPION */}
-              <div className="flex flex-col justify-center space-y-12">
-                <div className="text-center py-2 bg-slate-900 border border-slate-800 rounded-lg">
+              <div className="flex flex-col h-full">
+                <div className="text-center py-2 bg-slate-900 border border-slate-800 rounded-lg shrink-0 h-[52px] flex flex-col justify-center mb-6">
                   <span className="text-xs font-extrabold text-amber-500 uppercase tracking-widest font-mono">
                     Grand Final
                   </span>
                   <p className="text-[9px] text-slate-500 mt-0.5">Championship Match</p>
                 </div>
+                <div className="flex-1 flex flex-col justify-around py-2">
+                  {resolvedKnockout.finalMatch && (
+                    <BracketMatchCard 
+                      match={resolvedKnockout.finalMatch}
+                      adminMode={adminMode}
+                      onEdit={() => openKoMatchEditor(resolvedKnockout.finalMatch)}
+                    />
+                  )}
+                </div>
+              </div>
 
-                {/* Final Card */}
-                {resolvedKnockout.finalMatch && (
-                  <BracketMatchCard 
-                    match={resolvedKnockout.finalMatch}
-                    adminMode={adminMode}
-                    onEdit={() => openKoMatchEditor(resolvedKnockout.finalMatch)}
-                  />
-                )}
-
-                {/* Champion Banner inside tree layout */}
-                <div className="pt-8 border-t border-slate-800 text-center flex flex-col items-center">
-                  <div className={`p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-2xl ${resolvedKnockout.champion ? 'glow-gold animate-bounce' : 'opacity-40'}`}>
-                    <Trophy className={`w-14 h-14 ${resolvedKnockout.champion ? 'text-yellow-400' : 'text-slate-600'}`} />
-                  </div>
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#EAB308] font-bold block mt-3">
-                    TOURNAMENT CHAMPION
+              {/* CHAMPION SHOWCASE */}
+              <div className="flex flex-col h-full">
+                <div className="text-center py-2 bg-slate-900 border border-slate-800 rounded-lg shrink-0 h-[52px] flex flex-col justify-center mb-6">
+                  <span className="text-xs font-extrabold text-[#EAB308] uppercase tracking-widest font-mono">
+                    Champion
                   </span>
-                  <div className="mt-1 h-8 flex items-center justify-center">
-                    {resolvedKnockout.champion ? (
-                      <span className="text-lg font-black tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-200">
-                        🏆 {resolvedKnockout.champion.name}
-                      </span>
-                    ) : (
-                      <span className="text-xs text-slate-500 italic">
-                        Waiting for results...
-                      </span>
+                  <p className="text-[9px] text-slate-500 mt-0.5">Grand Coronation</p>
+                </div>
+                <div className="flex-1 flex flex-col justify-center py-2 whitespace-nowrap">
+                  <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-3xl text-center flex flex-col items-center justify-center space-y-4 max-w-sm mx-auto w-full transition-all duration-500 hover:border-yellow-500/30 overflow-hidden relative">
+                    {/* Background glow when champion exists */}
+                    {resolvedKnockout.champion && (
+                      <div className="absolute inset-0 bg-yellow-400/5 blur-2xl rounded-full scale-110 pointer-events-none" />
                     )}
+                    
+                    <div className={`p-5 bg-gradient-to-br from-slate-950 to-slate-900 border rounded-2xl flex items-center justify-center relative z-10 ${resolvedKnockout.champion ? 'border-yellow-500/40 shadow-[0_0_30px_rgba(234,179,8,0.2)] animate-bounce' : 'border-slate-800/80 opacity-40'}`}>
+                      <Trophy className={`w-12 h-12 ${resolvedKnockout.champion ? 'text-yellow-400 drop-shadow-[0_0_10px_rgba(234,179,8,0.4)]' : 'text-slate-600'}`} />
+                    </div>
+                    
+                    <div className="space-y-1.5 relative z-10 w-full">
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-[#EAB308] font-bold block">
+                        TOURNAMENT CHAMPION
+                      </span>
+                      <div className="h-10 flex items-center justify-center">
+                        {resolvedKnockout.champion ? (
+                          <span className="text-base font-black tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-amber-200 to-yellow-500 uppercase truncate px-2 block max-w-full">
+                            🏆 {resolvedKnockout.champion.name}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-slate-500 italic">
+                            Waiting for results...
+                          </span>
+                        )}
+                      </div>
+                      
+                      {resolvedKnockout.champion && (
+                        <div className="pt-2 border-t border-slate-850/60">
+                          <p className="text-[8px] font-mono text-slate-500 uppercase">
+                            REPRESENTING
+                          </p>
+                          <p className="text-[10px] font-sans font-bold text-slate-300 truncate">
+                            {resolvedKnockout.champion.source}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
