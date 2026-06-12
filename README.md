@@ -93,46 +93,6 @@ CORNER26-EFOOTBALL/
 
 The project aims to provide a digital solution for organizing E-Football tournaments efficiently while enhancing the overall experience for players and event coordinators.
 
-## 📸 Screenshots
-
-Add screenshots of the application here.
-
-```md
-![Home Page](screenshots/home.png)
-![Fixtures](screenshots/fixtures.png)
-![Leaderboard](screenshots/leaderboard.png)
-```
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-1. Fork the repository.
-2. Create a new branch:
-
-```bash
-git checkout -b feature-name
-```
-
-3. Commit your changes:
-
-```bash
-git commit -m "Add new feature"
-```
-
-4. Push to the branch:
-
-```bash
-git push origin feature-name
-```
-
-5. Open a Pull Request.
-
-## 📜 License
-
-This project is licensed under the MIT License.
-
----
 
 ## 👨‍💻 Author
 
